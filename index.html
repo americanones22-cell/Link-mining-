@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkShort - تلغيم الروابط الاحترافي</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* خلفية الجسيمات */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #00ff88, transparent),
+                radial-gradient(2px 2px at 40px 70px, #44ff44, transparent),
+                radial-gradient(1px 1px at 90px 40px, #00ff88, transparent),
+                radial-gradient(1px 1px at 130px 80px, #44ff44, transparent);
+            background-repeat: repeat;
+            background-size: 200px 100px;
+            animation: float 20s infinite linear;
+            z-index: -1;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            100% { transform: translateY(-100px) rotate(360deg); }
+        }
+
+        .container {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid #00ff88;
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 
+                0 0 30px rgba(0, 255, 136, 0.3),
+                inset 0 0 30px rgba(0, 255, 136, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent, rgba(0, 255, 136, 0.1), transparent);
+            animation: rotate 4s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
+        }
+
+        h1 {
+            font-size: 2.5em;
+            font-weight: 900;
+            background: linear-gradient(45deg, #00ff88, #44ff44, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 10px #00ff88); }
+            to { filter: drop-shadow(0 0 30px #00ff88); }
+        }
+
+        .subtitle {
+            color: #00ff88;
+            font-size: 1.2em;
+            margin-bottom: 40px;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        input[type="url"] {
+            width: 100%;
+            padding: 20px 25px;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.1em;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff88;
+            border-radius: 15px;
+            color: #ffffff;
+            transition: all 0.3s ease;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        input[type="url"]:focus {
+            outline: none;
+            border-color: #44ff44;
+            box-shadow: 0 0 25px rgba(0, 255, 136, 0.5);
+            transform: scale(1.02);
+        }
+
+        input[type="url"]::placeholder {
+            color: #666;
+            font-style: italic;
+        }
+
+        .btn-short {
+            background: linear-gradient(45deg, #00ff88, #44ff44);
+            border: none;
+            padding: 20px 50px;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #000;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.4);
+        }
+
+        .btn-short:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 255, 136, 0.6);
+        }
+
+        .btn-short:active {
+            transform: translateY(-2px);
+        }
+
+        .btn-short::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-short:hover::before {
+            left: 100%;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            border-radius: 15px;
+            display: none;
+        }
+
+        .short-link {
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 1.1em;
+            color: #00ff88;
+            margin: 10px 0;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .copy-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Orbitron', monospace;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #ff6666;
+            transform: scale(1.05);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            color: #00ff88;
+            font-size: 1.5em;
+            font-weight: bold;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+                margin: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 LinkShort</h1>
+        <p class="subtitle">أداة تلغيم الروابط الاحترافية - سريعة وآمنة</p>
+        
+        <div class="input-group">
+            <input type="url" id="originalLink" placeholder="أدخل الرابط الذي تريد تلغيمه هنا..." required>
+        </div>
+        
+        <button class="btn-short" onclick="shortenLink()">
+            🚀 تلغيم الرابط
+        </button>
+
+        <div class="result" id="result">
+            <div class="short-link" id="shortLink"></div>
+            <button class="copy-btn" onclick="copyLink()">📋 نسخ الرابط</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <span class="stat-number" id="totalLinks">0</span>
+                روابط ملغمة
+            </div>
+            <div class="stat">
+                <span class="stat-number" id="todayLinks">0</span>
+                اليوم
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let linkCounter = 0;
+        let todayCounter = 0;
+
+        // قائمة خدمات التلغيم المجانية (يمكنك إضافة المزيد)
+        const shorteners = [
+            'https://tinyurl.com/app/create/short/',
+            'https://lnkiy.com/new',
+            'https://bit.ly/',
+            'https://shorte.st/',
+            'https://rb.gy/'
+        ];
+
+        function shortenLink() {
+            const originalLink = document.getElementById('originalLink').value.trim();
+            
+            if (!originalLink) {
+                alert('⚠️ يرجى إدخال رابط صحيح أولاً!');
+                return;
+            }
+
+            if (!isValidUrl(originalLink)) {
+                alert('⚠️ الرابط غير صحيح! تأكد من إدخال رابط كامل (مثال: https://example.com)');
+                return;
+            }
+
+            // محاكاة عملية التلغيم مع تأثير بصري
+            const btn = document.querySelector('.btn-short');
+            btn.innerHTML = '⏳ جاري التلغيم...';
+            btn.style.background = 'linear-gradient(45deg, #666, #999)';
+            
+            setTimeout(() => {
+                // اختيار خدمة تلغيم عشوائية
+                const randomShortener = shorteners[Math.floor(Math.random() * shorteners.length)];
+                const shortLink = `${randomShortener}${generateShortCode(6)}`;
+                
+                document.getElementById('shortLink').textContent = shortLink;
+                document.getElementById('result').style.display = 'block';
+                
+                // إحصائيات
+                linkCounter++;
+                todayCounter++;
+                updateStats();
+                
+                btn.innerHTML = '✅ تم التلغيم!';
+                btn.style.background = 'linear-gradient(45deg, #44ff44, #00ff88)';
+                
+                setTimeout(() => {
+                    btn.innerHTML = '🚀 تلغيم الرابط';
+                    btn.style.background = 'linear-gradient(45deg, #00ff88, #44ff44)';
+                }, 2000);
+                
+                // التمرير للنتيجة
+                document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+            }, 2000);
+        }
+
+        function generateShortCode(length) {
+            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+
+        function copyLink() {
+            const shortLink = document.getElementById('shortLink').textContent;
+            navigator.clipboard.writeText(shortLink).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '✅ تم النسخ!';
+                btn.style.background = '#44ff44';
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '#ff4444';
+                }, 2000);
+            });
+        }
+
+        function updateStats() {
+            document.getElementById('totalLinks').textContent = linkCounter;
+            document.getElementById('todayLinks').textContent = todayCounter;
+        }
+
+        // السماح بالضغط Enter
+        document.getElementById('originalLink').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                shortenLink();
+            }
+        });
+
+        // تأثير الكتابة عند تحميل الصفحة
+        window.addEventListener('load', () => {
+            const input = document.getElementById('originalLink');
+            input.focus();
+        });
+    </script>
+</body>
+</html>
